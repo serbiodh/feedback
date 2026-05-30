@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Retroalimentación tras exámenes · EduMed EvalUVa Retroalimentador</title>
+<style>
+  /* ── PALETA EXACTA de tutorcyllo.github.io/EduMed.EvalUVa.Rubricas ── */
+  :root {
+    --c-bg:          #f8f9fa;       /* fondo página */
+    --c-surface:     #ffffff;       /* tarjetas / secciones */
+    --c-border:      #e2e8f0;       /* bordes suaves */
+    --c-navy:        #1e3a5f;       /* azul marino institucional */
+    --c-navy-dark:   #162d4a;       /* navy más oscuro – hover */
+    --c-teal:        #0891b2;       /* acento turquesa / cian */
+    --c-teal-light:  #e0f2fe;       /* fondo teal suave */
+    --c-teal-mid:    #0e7490;       /* teal oscuro */
+    --c-text:        #1f2937;       /* texto principal */
+    --c-muted:       #6b7280;       /* texto secundario */
+    --c-green-bg:    #f0fdf4;       /* fondo bloque "idea clave" */
+    --c-green-bd:    #22c55e;       /* borde idea clave */
+    --c-amber-bg:    #fffbeb;       /* fondo aviso */
+    --c-amber-bd:    #f59e0b;       /* borde aviso */
+    --c-red-bg:      #fef2f2;       /* fondo malo */
+    --c-red-bd:      #ef4444;       /* borde malo */
+    --c-tag-bg:      #dbeafe;       /* badge hero */
+    --c-tag-text:    #1e40af;
+    --radius:        10px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--c-bg);
+    color: var(--c-text);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+
+  /* ─── HEADER ─── */
+  header {
+    background: var(--c-navy);
+    color: #fff;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 6px rgba(0,0,0,.35);
+  }
+  .header-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 28px;
+    border-bottom: 1px solid rgba(255,255,255,.12);
+    font-size: 12px;
+    color: rgba(255,255,255,.7);
+  }
+  .header-top a { color: rgba(255,255,255,.85); text-decoration: none; }
+  .header-top a:hover { color: #fff; }
+  nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px;
+    padding: 5px 28px 7px;
+    overflow-x: auto;
+  }
+  nav a {
+    color: rgba(255,255,255,.72);
+    text-decoration: none;
+    font-size: 11.5px;
+    padding: 4px 10px;
+    border-radius: 5px;
+    white-space: nowrap;
+    transition: background .15s, color .15s;
+  }
+  nav a:hover { background: rgba(255,255,255,.15); color: #fff; }
+
+  /* ─── HERO ─── */
+  .hero {
+    background: linear-gradient(135deg, var(--c-navy) 0%, var(--c-teal-mid) 55%, var(--c-teal) 100%);
+    color: #fff;
+    padding: 52px 32px 48px;
+    text-align: center;
+  }
+  .guia-label {
+    font-size: 11px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    opacity: .65;
+    margin-bottom: 12px;
+  }
+  .hero-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 22px;
+  }
+  .hero-badges span {
+    background: rgba(255,255,255,.18);
+    border: 1px solid rgba(255,255,255,.3);
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 11.5px;
+    font-weight: 500;
+    letter-spacing: .03em;
+  }
+  .hero h1 {
+    font-size: clamp(1.55rem, 3.2vw, 2.35rem);
+    font-weight: 700;
+    line-height: 1.25;
+    max-width: 800px;
+    margin: 0 auto 14px;
+  }
+  .hero p {
+    font-size: 1rem;
+    max-width: 660px;
+    margin: 0 auto;
+    opacity: .88;
+  }
+
+  /* ─── LAYOUT ─── */
+  main { max-width: 900px; margin: 0 auto; padding: 32px 18px 56px; }
+
+  /* ─── SECCIONES ─── */
+  section {
+    background: var(--c-surface);
+    border: 1px solid var(--c-border);
+    border-radius: var(--radius);
+    padding: 30px 34px;
+    margin-bottom: 24px;
+    scroll-margin-top: 68px;
+  }
+  .sec-num {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--c-teal);
+    margin-bottom: 6px;
+  }
+  h2 {
+    font-size: 1.28rem;
+    font-weight: 700;
+    color: var(--c-navy);
+    margin-bottom: 14px;
+    line-height: 1.3;
+  }
+  h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--c-navy);
+    margin: 20px 0 8px;
+  }
+  p { margin-bottom: 11px; }
+  p:last-child { margin-bottom: 0; }
+  ul, ol { padding-left: 20px; margin-bottom: 11px; }
+  li { margin-bottom: 4px; }
+
+  /* ─── TABLAS ─── */
+  .tw { overflow-x: auto; margin: 14px 0; }
+  table { border-collapse: collapse; width: 100%; font-size: .875rem; }
+  thead th {
+    background: var(--c-navy);
+    color: #fff;
+    padding: 9px 13px;
+    text-align: left;
+    font-weight: 600;
+    font-size: .82rem;
+  }
+  tbody tr:nth-child(even) { background: #f8fafc; }
+  tbody td {
+    padding: 8px 13px;
+    border-bottom: 1px solid var(--c-border);
+    vertical-align: top;
+  }
+  tbody tr:hover { background: var(--c-teal-light); }
+
+  /* ─── IDEA CLAVE ─── */
+  .idea {
+    background: var(--c-green-bg);
+    border-left: 4px solid var(--c-green-bd);
+    border-radius: 0 8px 8px 0;
+    padding: 14px 18px;
+    margin-top: 20px;
+    font-size: .9rem;
+  }
+  .idea strong {
+    display: block;
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: #15803d;
+    margin-bottom: 4px;
+  }
+
+  /* ─── CAJAS ─── */
+  .box {
+    border-left: 4px solid var(--c-teal);
+    background: var(--c-teal-light);
+    padding: 13px 17px;
+    border-radius: 0 8px 8px 0;
+    margin: 13px 0;
+    font-size: .9rem;
+  }
+  .box.warn {
+    border-color: var(--c-amber-bd);
+    background: var(--c-amber-bg);
+  }
+
+  /* ─── CARDS GRID ─── */
+  .cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 12px;
+    margin: 14px 0;
+  }
+  .card {
+    background: #f1f5f9;
+    border: 1px solid var(--c-border);
+    border-radius: 8px;
+    padding: 15px;
+  }
+  .card .ci { font-size: 1.4rem; margin-bottom: 7px; }
+  .card .ct { font-weight: 700; font-size: .88rem; color: var(--c-navy); margin-bottom: 4px; }
+  .card p  { font-size: .83rem; color: #475569; margin-bottom: 0; }
+
+  /* ─── COMPARATIVA ─── */
+  .compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 14px 0;
+  }
+  .cbox {
+    border-radius: 8px;
+    padding: 15px;
+    font-size: .86rem;
+  }
+  .cbox.ok  { background: #f0fdf4; border: 1px solid #86efac; }
+  .cbox.bad { background: var(--c-red-bg); border: 1px solid #fca5a5; }
+  .cbox .cl { font-weight: 700; font-size: .72rem; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 8px; }
+  .cbox.ok  .cl { color: #15803d; }
+  .cbox.bad .cl { color: #b91c1c; }
+  .cbox p  { margin-bottom: 6px; font-style: italic; }
+  .cbox p:last-child { margin-bottom: 0; }
+
+  /* ─── PASOS ─── */
+  .steps { list-style: none; padding: 0; margin: 12px 0; }
+  .steps li {
+    display: flex;
+    gap: 13px;
+    align-items: flex-start;
+    padding: 11px 0;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .steps li:last-child { border-bottom: none; }
+  .sn {
+    background: var(--c-navy);
+    color: #fff;
+    min-width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .78rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .sb { font-size: .88rem; }
+  .sb strong { display: block; color: var(--c-navy); margin-bottom: 2px; font-size: .9rem; }
+
+  /* ─── FÓRMULA ─── */
+  .formula {
+    background: var(--c-navy);
+    color: #e2e8f0;
+    border-radius: 8px;
+    padding: 16px 20px;
+    font-family: 'Courier New', monospace;
+    font-size: .88rem;
+    line-height: 1.9;
+    margin: 13px 0;
+  }
+  .formula .fl {
+    font-family: 'Segoe UI', sans-serif;
+    font-size: .7rem;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: rgba(255,255,255,.5);
+    margin-bottom: 6px;
+  }
+
+  /* ─── CHECKLIST ─── */
+  .ck { list-style: none; padding: 0; margin: 10px 0; }
+  .ck li { padding: 5px 0 5px 24px; position: relative; font-size: .89rem; }
+  .ck li::before { content: "☑"; position: absolute; left: 0; color: var(--c-teal); }
+
+  /* ─── REFS ─── */
+  .ref {
+    border: 1px solid var(--c-border);
+    border-radius: 8px;
+    padding: 16px 18px;
+    margin-bottom: 14px;
+    background: #f8fafc;
+  }
+  .ref h3 { font-size: .9rem; margin: 0 0 5px; color: var(--c-navy); }
+  .ref p  { font-size: .84rem; margin-bottom: 7px; color: #374151; }
+  .ref ul { font-size: .83rem; color: #374151; }
+
+  /* ─── BACK TOP ─── */
+  .back { display: block; text-align: center; margin-top: 8px; font-size: .84rem; color: var(--c-teal); cursor: pointer; text-decoration: none; }
+  .back:hover { color: var(--c-navy); }
+
+  /* ─── FOOTER ─── */
+  footer {
+    background: var(--c-navy);
+    color: rgba(255,255,255,.65);
+    text-align: center;
+    padding: 26px 20px;
+    font-size: .8rem;
+    line-height: 1.9;
+  }
+  footer strong { color: rgba(255,255,255,.88); }
+
+  @media (max-width: 600px) {
+    section { padding: 20px 16px; }
+    .hero { padding: 34px 18px 30px; }
+    nav, .header-top { padding-left: 14px; padding-right: 14px; }
+    .compare { grid-template-columns: 1fr; }
+    .cards { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-top">
+    <span>🎓</span>
+    <a href="#">EduMed EvalUVa 4.0 · Facultad de Medicina · Universidad de Valladolid</a>
+    <span style="margin-left:auto;opacity:.5">Guía docente · 2026</span>
+  </div>
+  <nav>
+    <a href="#s01">Intro</a>
+    <a href="#s02">¿Qué es?</a>
+    <a href="#s03">Principios</a>
+    <a href="#s04">Preparar</a>
+    <a href="#s05">Grupal</a>
+    <a href="#s06">Individual</a>
+    <a href="#s07">Formular</a>
+    <a href="#s08">Emocional</a>
+    <a href="#s09">Herramientas</a>
+    <a href="#s10">Cultura</a>
+    <a href="#s11">Referencias</a>
+  </nav>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <p class="guia-label">Guía práctica para docentes · EduMed EvalUVa Retroalimentador</p>
+  <div class="hero-badges">
+    <span>Docentes clínicos</span>
+    <span>Tutores de grado</span>
+    <span>Coordinadores de asignatura</span>
+    <span>Evaluación formativa</span>
+  </div>
+  <h1>Cómo diseñar una retroalimentación eficaz tras el examen en Educación Médica</h1>
+  <p>Guía práctica para que el profesorado transforme los resultados de un examen en una oportunidad real de aprendizaje. Basada en evidencia científica.</p>
+</div>
+
+<main>
+
+<!-- 01 -->
+<section id="s01">
+  <div class="sec-num">📌 01 · El examen como oportunidad de aprendizaje</div>
+  <h2>Por qué la devolución importa tanto como la nota</h2>
+  <p>Un examen no debería terminar cuando se publica la calificación. Desde una perspectiva formativa, el examen es también una fuente de información sobre cómo está aprendiendo el alumnado: qué conceptos domina, qué errores repite, cómo razona ante un problema clínico o anatómico, y qué necesita cambiar para mejorar en la siguiente prueba.</p>
+  <p>La retroalimentación tras un examen permite transformar un resultado numérico en una oportunidad de aprendizaje. Para ello, no basta con mostrar la respuesta correcta. Es necesario ayudar al estudiante a comprender <strong>por qué su respuesta fue adecuada o inadecuada</strong>, qué criterio se utilizó para evaluarla y qué pasos puede seguir para progresar.</p>
+  <p>En educación médica, el aprendizaje profesional se basa en un ciclo continuo de práctica, observación, feedback y nueva práctica. La literatura insiste en que «la práctica por sí sola no hace la perfección»: lo que favorece la mejora es la práctica acompañada de retroalimentación específica y orientada a la acción.</p>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Función</th><th>Qué aporta al aprendizaje</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Clarifica expectativas</strong></td><td>Ayuda a entender qué se esperaba en la respuesta.</td></tr>
+        <tr><td><strong>Identifica patrones de error</strong></td><td>Permite reconocer dificultades conceptuales o de razonamiento.</td></tr>
+        <tr><td><strong>Orienta el estudio futuro</strong></td><td>Señala qué debe cambiar el estudiante para mejorar.</td></tr>
+        <tr><td><strong>Favorece la autorregulación</strong></td><td>Ayuda al alumnado a evaluar mejor su propio desempeño.</td></tr>
+        <tr><td><strong>Refuerza la cultura de mejora</strong></td><td>Presenta el error como parte del aprendizaje, no como fracaso definitivo.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="idea"><strong>📌 Idea clave</strong>Un examen no solo mide lo aprendido; también puede enseñar, si se acompaña de una retroalimentación clara, específica y orientada a la mejora.</div>
+</section>
+
+<!-- 02 -->
+<section id="s02">
+  <div class="sec-num">02 · ¿Qué es la retroalimentación?</div>
+  <h2>Qué es —y qué no es— la retroalimentación</h2>
+  <p>La retroalimentación es información que compara el desempeño del estudiante con un estándar esperado y que se ofrece con la intención de mejorar su rendimiento. Aplicado a un examen, debe responder a tres preguntas:</p>
+  <ul>
+    <li><strong>¿Qué hizo el estudiante?</strong> Por ejemplo: eligió un distractor, omitió un dato clínico, confundió dos conceptos o no integró la información del caso.</li>
+    <li><strong>¿Qué se esperaba que hiciera?</strong> Por ejemplo: identificar una estructura anatómica, aplicar un mecanismo fisiopatológico o justificar una opción correcta.</li>
+    <li><strong>¿Qué puede hacer para mejorar?</strong> Por ejemplo: revisar un concepto concreto, entrenar el razonamiento con casos o practicar respuestas justificadas.</li>
+  </ul>
+  <div class="compare">
+    <div class="cbox ok">
+      <div class="cl">✔ Sí es feedback cuando…</div>
+      <p>Se centra en una respuesta concreta: <em>«La respuesta identifica la lesión, pero no explica la vía afectada.»</em></p>
+      <p>Se vincula a un criterio: <em>«Para obtener la puntuación completa era necesario justificar la relación anatomo-clínica.»</em></p>
+      <p>Ayuda a mejorar: <em>«En próximas preguntas, intenta justificar cada opción descartada.»</em></p>
+    </div>
+    <div class="cbox bad">
+      <div class="cl">✗ No es feedback cuando…</div>
+      <p>Solo informa de la nota: <em>«Has sacado un 5,2.»</em></p>
+      <p>Es demasiado general: <em>«Tienes que estudiar más.»</em></p>
+      <p>Juzga a la persona: <em>«No tienes nivel suficiente.»</em></p>
+      <p>No orienta la mejora: <em>«Esta respuesta está mal.»</em></p>
+    </div>
+  </div>
+  <div class="idea"><strong>📌 Idea clave</strong>La retroalimentación no consiste en decir al estudiante «qué nota tiene», sino en ayudarle a entender qué debe mantener, qué debe corregir y cómo puede mejorar.</div>
+</section>
+
+<!-- 03 -->
+<section id="s03">
+  <div class="sec-num">03 · Principios</div>
+  <h2>Principios del feedback eficaz tras un examen</h2>
+  <p>Una retroalimentación eficaz debe ser <strong>clara, específica, oportuna, accionable, equilibrada y basada en criterios</strong>.</p>
+  <div class="cards">
+    <div class="card"><div class="ci">🔍</div><div class="ct">Claridad</div><p>El estudiante debe entender el mensaje. «Falta profundidad» necesita concretarse.</p></div>
+    <div class="card"><div class="ci">🎯</div><div class="ct">Especificidad</div><p>Debe referirse a elementos concretos: conceptos, pasos de razonamiento, terminología, aplicación clínica.</p></div>
+    <div class="card"><div class="ci">⏱️</div><div class="ct">Oportunidad</div><p>Debe llegar cuando todavía puede utilizarse, sin retrasar demasiado la devolución.</p></div>
+    <div class="card"><div class="ci">🚀</div><div class="ct">Acción</div><p>Debe indicar una vía de mejora concreta. No basta con describir el error.</p></div>
+    <div class="card"><div class="ci">📋</div><div class="ct">Basado en criterios</div><p>Vinculado a objetivos de aprendizaje o rúbricas. Aumenta la transparencia.</p></div>
+    <div class="card"><div class="ci">🧑‍🎓</div><div class="ct">Centrado en la tarea</div><p>Describe el desempeño, no etiqueta a la persona.</p></div>
+  </div>
+  <div class="box">
+    <strong>Ejemplo de feedback mejorado</strong><br>
+    En lugar de: <em>«La respuesta es incompleta.»</em><br>
+    Mejor: <em>«La respuesta identifica la estructura, pero no explica su relación con el déficit motor descrito en el caso.»</em>
+  </div>
+  <div class="idea"><strong>📌 Idea clave</strong>El feedback eficaz no solo informa del error: lo explica, lo contextualiza y lo convierte en una acción concreta de mejora.</div>
+</section>
+
+<!-- 04 -->
+<section id="s04">
+  <div class="sec-num">04 · Preparación</div>
+  <h2>Preparar la devolución: análisis previo del examen</h2>
+  <p>Una buena devolución empieza antes de hablar con el alumnado. La pregunta clave no es solo «¿qué preguntas han fallado?», sino «¿qué nos dicen esos errores sobre el aprendizaje del grupo?».</p>
+  <h3>Analizar patrones, no solo preguntas</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Aspecto a revisar</th><th>Pregunta docente</th></tr></thead>
+    <tbody>
+      <tr><td>Preguntas con más fallos</td><td>¿Evaluaban contenidos difíciles, mal explicados o mal formulados?</td></tr>
+      <tr><td>Distractores muy elegidos</td><td>¿Qué razonamiento incorrecto revela esa elección?</td></tr>
+      <tr><td>Preguntas con bajo rendimiento global</td><td>¿Hubo un problema de comprensión del concepto o del enunciado?</td></tr>
+      <tr><td>Respuestas parcialmente correctas</td><td>¿Qué parte del razonamiento está consolidada y cuál falta?</td></tr>
+      <tr><td>Diferencias entre bloques</td><td>¿Hay contenidos o competencias especialmente débiles?</td></tr>
+    </tbody>
+  </table></div>
+  <h3>Clasificar los errores</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Tipo de error</th><th>Ejemplo</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Conceptual</strong></td><td>Confundir dos estructuras, mecanismos o definiciones.</td></tr>
+      <tr><td><strong>De razonamiento</strong></td><td>Elegir una opción compatible con un dato, pero no con el conjunto del caso.</td></tr>
+      <tr><td><strong>De aplicación clínica</strong></td><td>Saber el concepto, pero no aplicarlo a un escenario clínico.</td></tr>
+      <tr><td><strong>De interpretación</strong></td><td>No identificar correctamente qué pide el enunciado.</td></tr>
+      <tr><td><strong>De precisión</strong></td><td>Usar términos vagos o anatómicamente imprecisos.</td></tr>
+      <tr><td><strong>De jerarquización</strong></td><td>Dar importancia a un dato secundario e ignorar el dato clave.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="idea"><strong>📌 Idea clave</strong>Preparar la devolución consiste en transformar los resultados del examen en información útil para que el alumnado comprenda cómo está aprendiendo.</div>
+</section>
+
+<!-- 05 -->
+<section id="s05">
+  <div class="sec-num">05 · Devolución grupal</div>
+  <h2>La devolución grupal: transformar errores comunes en aprendizaje</h2>
+  <p>La devolución grupal es una oportunidad para convertir el examen en una actividad docente. Su objetivo no debería ser únicamente revisar respuestas correctas, sino ayudar al grupo a comprender los errores más frecuentes y el razonamiento esperado.</p>
+  <h3>Estructura recomendada</h3>
+  <ol class="steps">
+    <li><div class="sn">1</div><div class="sb"><strong>Presentar el propósito de la sesión</strong>Explicar que la finalidad no es «defender la nota», sino aprender del examen y preparar mejor las siguientes tareas de evaluación.</div></li>
+    <li><div class="sn">2</div><div class="sb"><strong>Mostrar una visión global del examen</strong>Bloques con mejor y peor rendimiento, preguntas con mayor dificultad, competencias consolidadas y errores más repetidos. Siempre formulado de manera no culpabilizadora.</div></li>
+    <li><div class="sn">3</div><div class="sb"><strong>Analizar preguntas representativas</strong>Identificar el objetivo, leer el enunciado, justificar la correcta, analizar distractores y generalizar el aprendizaje.</div></li>
+    <li><div class="sn">4</div><div class="sb"><strong>Trabajar el error como material docente</strong>Presentar los errores frecuentes de forma anónima y respetuosa: <em>«Una respuesta frecuente fue elegir la opción B. Esa opción es atractiva porque…»</em></div></li>
+    <li><div class="sn">5</div><div class="sb"><strong>Cerrar con recomendaciones concretas</strong>Cómo estudiar determinados contenidos, cómo practicar preguntas clínicas, qué razonamiento se espera en próximos exámenes.</div></li>
+  </ol>
+  <div class="idea"><strong>📌 Idea clave</strong>La devolución grupal no debe ser una negociación colectiva de respuestas, sino una sesión para aprender a razonar mejor a partir de los errores comunes.</div>
+</section>
+
+<!-- 06 -->
+<section id="s06">
+  <div class="sec-num">06 · Devolución individual</div>
+  <h2>La devolución individual: del resultado al plan de mejora</h2>
+  <p>La devolución individual permite adaptar el feedback a las necesidades concretas de cada estudiante. Es especialmente útil cuando hay bajo rendimiento, errores persistentes o discrepancia entre esfuerzo y resultado.</p>
+  <h3>Antes de dar feedback: pedir autoevaluación</h3>
+  <p>Comenzar con preguntas como: ¿Cómo interpretas tu resultado? ¿Qué parte del examen te resultó más difícil? ¿Qué tipo de preguntas crees que fallaste más? ¿Qué cambiarías para la próxima prueba?</p>
+  <h3>Acordar un plan de acción</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Dificultad detectada</th><th>Acción recomendada</th></tr></thead>
+    <tbody>
+      <tr><td>Falla preguntas de aplicación clínica</td><td>Practicar casos breves y justificar cada respuesta.</td></tr>
+      <tr><td>Confunde estructuras próximas</td><td>Elaborar tablas comparativas con función, localización y clínica.</td></tr>
+      <tr><td>Responde de forma incompleta</td><td>Usar una plantilla: concepto + justificación + consecuencia.</td></tr>
+      <tr><td>Interpreta mal enunciados</td><td>Subrayar verbo, dato clave y condición clínica antes de responder.</td></tr>
+      <tr><td>No detecta sus errores</td><td>Revisar el examen clasificando cada fallo por tipo de error.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="box warn"><strong>⚠️ Cuidar la dimensión emocional</strong><br>Recibir feedback tras un mal resultado puede generar frustración o defensividad. Es preferible seleccionar una o dos prioridades claras antes que ofrecer una lista larga de fallos.</div>
+  <div class="idea"><strong>📌 Idea clave</strong>La devolución individual no consiste solo en explicar una nota: debe ayudar al estudiante a entender su patrón de desempeño y a construir un plan de mejora concreto.</div>
+</section>
+
+<!-- 07 -->
+<section id="s07">
+  <div class="sec-num">07 · Cómo formular comentarios</div>
+  <h2>Cómo formular comentarios útiles</h2>
+  <p>El valor de la retroalimentación depende en gran medida de cómo se formula. Los comentarios vagos, aunque bienintencionados, suelen tener poco efecto porque no indican una acción concreta.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Comentario poco útil</th><th>Comentario más útil</th></tr></thead>
+    <tbody>
+      <tr><td>«Respuesta incompleta.»</td><td>«La respuesta menciona el diagnóstico, pero falta justificarlo con dos datos del caso clínico.»</td></tr>
+      <tr><td>«Tienes que estudiar más.»</td><td>«Los errores se concentran en preguntas de vías motoras. Conviene repasar el recorrido de la vía corticoespinal.»</td></tr>
+      <tr><td>«Mal razonado.»</td><td>«Has elegido una opción compatible con un síntoma aislado, pero no con el conjunto del cuadro clínico.»</td></tr>
+      <tr><td>«Falta precisión.»</td><td>«Usas "troncoencéfalo" de forma demasiado general; era necesario localizar la lesión en protuberancia.»</td></tr>
+      <tr><td>«Bien.»</td><td>«La respuesta es adecuada porque identifica la estructura y justifica correctamente su relación funcional.»</td></tr>
+    </tbody>
+  </table></div>
+  <h3>Fórmulas para redactar feedback</h3>
+  <div class="formula">
+    <div class="fl">Fórmula 1 · Has hecho / Falta / Para mejorar</div>
+    «Has identificado correctamente el nervio afectado. Falta explicar por qué la lesión produce pérdida sensitiva en ese territorio. Para mejorar, intenta justificar cada respuesta relacionando anatomía, función y síntoma.»
+  </div>
+  <div class="formula">
+    <div class="fl">Fórmula 2 · Evidencia + Interpretación + Acción</div>
+    «En tres preguntas has confundido lesiones centrales y periféricas. Esto sugiere que necesitas reforzar la localización de la lesión dentro de la vía motora. Para el próximo examen, practica casos en los que tengas que decidir si el patrón es de primera o segunda motoneurona.»
+  </div>
+  <div class="box warn"><strong>⚠️ Sobre el «feedback sándwich»</strong><br>Las guías recientes advierten que puede diluir el mensaje principal. Se recomienda priorizar comentarios directos, específicos y orientados al futuro. Las fortalezas deben señalarse cuando sean relevantes y concretas, no como fórmula automática.</div>
+  <div class="idea"><strong>📌 Idea clave</strong>Un buen comentario no solo describe el error: ayuda al estudiante a saber qué hacer distinto la próxima vez.</div>
+</section>
+
+<!-- 08 -->
+<section id="s08">
+  <div class="sec-num">08 · Dimensión emocional</div>
+  <h2>Gestionar la dimensión emocional del feedback</h2>
+  <p>Recibir retroalimentación tras un examen puede ser emocionalmente difícil. Si estas emociones no se gestionan bien, pueden impedir que el estudiante escuche, acepte y utilice el feedback.</p>
+  <h3>Separar desempeño e identidad</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Evitar</th><th>Sustituir por</th></tr></thead>
+    <tbody>
+      <tr><td>«No sabes razonar.»</td><td>«En esta respuesta falta explicitar el razonamiento que conecta los datos del caso con la conclusión.»</td></tr>
+      <tr><td>«Tu nivel es bajo.»</td><td>«Ahora mismo hay dificultades en la aplicación clínica de estos conceptos.»</td></tr>
+      <tr><td>«No entiendes la asignatura.»</td><td>«Los errores se concentran en la integración entre anatomía y función.»</td></tr>
+      <tr><td>«Has contestado fatal.»</td><td>«La respuesta no responde al criterio principal que se evaluaba.»</td></tr>
+    </tbody>
+  </table></div>
+  <div class="cards" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr));margin-top:14px;">
+    <div class="card"><div class="ci">🛡️</div><div class="ct">Crear seguridad psicológica</div><p>Evitar la humillación pública, no usar errores individuales como ejemplo identificable. En la devolución grupal: «Una respuesta frecuente fue…»</p></div>
+    <div class="card"><div class="ci">🔄</div><div class="ct">Normalizar el error</div><p>El error no es una anomalía, sino una fuente de información. En medicina, aprender implica ajustar progresivamente conceptos y razonamientos.</p></div>
+    <div class="card"><div class="ci">💬</div><div class="ct">Reconocer la emoción</div><p>«Entiendo que este resultado pueda frustrarte. Vamos a ver qué información nos da el examen y qué puedes hacer para mejorar.»</p></div>
+  </div>
+  <div class="idea"><strong>📌 Idea clave</strong>La retroalimentación no debe proteger al estudiante de toda incomodidad, pero sí debe evitar que la incomodidad bloquee el aprendizaje.</div>
+</section>
+
+<!-- 09 -->
+<section id="s09">
+  <div class="sec-num">09 · Herramientas</div>
+  <h2>Herramientas para facilitar la retroalimentación</h2>
+  <p>Dar feedback de calidad a grupos numerosos puede ser difícil. Las herramientas que se presentan a continuación permiten que la retroalimentación sea más clara, consistente y sostenible, sin sustituir el criterio docente.</p>
+  <h3>Rúbricas</h3>
+  <p>Especialmente útiles en preguntas de desarrollo, casos clínicos y exámenes orales. Permiten explicitar qué se espera y cómo se valora cada dimensión.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Criterio</th><th>Qué valora</th></tr></thead>
+    <tbody>
+      <tr><td>Identificación anatómica</td><td>Reconoce la estructura o vía afectada.</td></tr>
+      <tr><td>Justificación funcional</td><td>Explica la relación entre estructura y función.</td></tr>
+      <tr><td>Aplicación clínica</td><td>Relaciona la lesión con los síntomas.</td></tr>
+      <tr><td>Precisión terminológica</td><td>Usa términos anatómicos correctos.</td></tr>
+      <tr><td>Claridad de la respuesta</td><td>Organiza la explicación de forma comprensible.</td></tr>
+    </tbody>
+  </table></div>
+  <h3>Plantillas de comentarios frecuentes</h3>
+  <ul class="ck">
+    <li>«Identificas correctamente la estructura, pero falta justificar su función.»</li>
+    <li>«La respuesta contiene información correcta, pero no responde exactamente a lo preguntado.»</li>
+    <li>«Confundes localización anatómica con consecuencia funcional.»</li>
+    <li>«El razonamiento se basa en un dato aislado y no integra el conjunto del caso.»</li>
+    <li>«La respuesta sería más completa si incluyera una relación explícita entre lesión y síntoma.»</li>
+  </ul>
+  <h3>Banco de errores frecuentes</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Categoría</th><th>Ejemplo de error</th></tr></thead>
+    <tbody>
+      <tr><td>Confusión conceptual</td><td>Confundir núcleo, tracto y nervio.</td></tr>
+      <tr><td>Error anatomo-clínico</td><td>Localizar una lesión por el síntoma correcto, pero en el nivel incorrecto.</td></tr>
+      <tr><td>Lectura superficial</td><td>Responder a una palabra clave sin interpretar el caso completo.</td></tr>
+      <tr><td>Falta de justificación</td><td>Elegir la respuesta correcta sin explicar por qué.</td></tr>
+      <tr><td>Terminología imprecisa</td><td>Usar términos amplios cuando se requiere localización específica.</td></tr>
+    </tbody>
+  </table></div>
+  <h3>Herramientas digitales e IA</h3>
+  <p>La IA puede ser útil para clasificar errores frecuentes, proponer borradores de comentarios, resumir patrones de rendimiento o generar preguntas de práctica adaptadas a los errores detectados. Su uso debe ser prudente, con atención a la transparencia, la equidad y el mantenimiento del juicio humano.</p>
+  <div class="idea"><strong>📌 Idea clave</strong>Las herramientas mejoran el feedback cuando ayudan a hacerlo más claro, específico y accionable; no cuando solo automatizan comentarios genéricos.</div>
+</section>
+
+<!-- 10 -->
+<section id="s10">
+  <div class="sec-num">10 · Cultura de feedback</div>
+  <h2>Crear una cultura de feedback en la asignatura</h2>
+  <p>La retroalimentación no debería aparecer solo después del examen final. Para que sea eficaz, debe formar parte de la cultura de la asignatura, de modo que el alumnado se acostumbre a recibir, pedir, interpretar y utilizar feedback a lo largo del curso.</p>
+  <h3>Explicar los criterios antes del examen</h3>
+  <p>La cultura de feedback empieza antes de evaluar. Si el alumnado conoce los objetivos, el tipo de razonamiento esperado y los criterios de corrección, podrá interpretar mejor la devolución posterior.</p>
+  <h3>Enseñar al alumnado a pedir feedback</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Pregunta poco útil</th><th>Pregunta más útil</th></tr></thead>
+    <tbody>
+      <tr><td>«¿Qué tal está mi examen?»</td><td>«¿Qué tipo de error se repite más en mis respuestas?»</td></tr>
+      <tr><td>«¿Qué tengo que estudiar?»</td><td>«¿Qué conceptos necesito reforzar para resolver mejor casos clínicos?»</td></tr>
+      <tr><td>«¿Por qué he suspendido?»</td><td>«¿Qué diferencia hay entre mis respuestas y el nivel esperado?»</td></tr>
+      <tr><td>«¿Me puedes subir la nota?»</td><td>«¿Qué debería hacer distinto para mejorar en la próxima prueba?»</td></tr>
+    </tbody>
+  </table></div>
+  <h3>Separar feedback formativo y reclamación</h3>
+  <p>Conviene diferenciar dos espacios: la <strong>revisión académica o reclamación</strong>, centrada en errores de corrección, y la <strong>devolución formativa</strong>, centrada en comprender el desempeño y mejorar. Ambas son legítimas, pero no deben confundirse.</p>
+  <h3>Cerrar el ciclo</h3>
+  <p>Después de una devolución, conviene ofrecer una actividad posterior: repetir una pregunta similar, corregir una respuesta propia, elaborar una respuesta modelo, resolver un caso nuevo o escribir un breve plan de mejora.</p>
+  <div class="idea"><strong>📌 Idea clave</strong>La retroalimentación no es un evento aislado después del examen, sino una práctica continua que enseña al alumnado a mejorar de forma progresiva.</div>
+</section>
+
+<!-- 11 -->
+<section id="s11">
+  <div class="sec-num">11 · Referencias</div>
+  <h2>Referencias y lecturas recomendadas</h2>
+  <div class="ref">
+    <h3>Sargeant J, Mann K. <em>Feedback in Medical Education: Skills for Improving Learner Performance</em></h3>
+    <p>Base conceptual sobre el sentido del feedback en educación médica. Especialmente útil para comprender la diferencia entre feedback y juicio personal, la importancia de la cultura de mejora y la dimensión emocional de recibir retroalimentación.</p>
+    <ul>
+      <li>La diferencia entre feedback y juicio personal.</li>
+      <li>La necesidad de feedback específico y contextualizado.</li>
+      <li>La idea de que la práctica mejora cuando se acompaña de retroalimentación.</li>
+    </ul>
+  </div>
+  <div class="ref">
+    <h3>Natesan S, Jordan J, Sheng A, et al. <em>Feedback in Medical Education: An Evidence-based Guide to Best Practices from CORD</em>. Western Journal of Emergency Medicine, 2023.</h3>
+    <p>Revisión con recomendaciones basadas en evidencia. Resume características del feedback de calidad y el papel activo del estudiante.</p>
+    <ul>
+      <li>Principios del feedback eficaz y papel activo del estudiante.</li>
+      <li>Herramientas físicas y digitales de feedback.</li>
+      <li>Necesidad de procesos estructurados, longitudinales y transparentes.</li>
+    </ul>
+  </div>
+  <div class="ref">
+    <h3>Lipnevich AA, Mattern K, Feddock C. <em>Formative assessment and feedback in medical education: A practical guide. AMEE Guide No. 189</em>. Medical Teacher, 2025.</h3>
+    <p>Guía que integra la retroalimentación dentro de un sistema más amplio de aprendizaje: evaluación continua, autoevaluación, tecnología e IA.</p>
+    <ul>
+      <li>Evaluación formativa como proceso continuo.</li>
+      <li>Uso de rúbricas y criterios explícitos.</li>
+      <li>Papel de herramientas digitales, analítica e IA.</li>
+    </ul>
+  </div>
+  <h3 style="margin-top:20px;">¿Para qué profundizar?</h3>
+  <div class="tw"><table>
+    <thead><tr><th>Para profundizar en…</th><th>Lectura recomendada</th></tr></thead>
+    <tbody>
+      <tr><td>Fundamentos del feedback en educación médica</td><td>Sargeant y Mann</td></tr>
+      <tr><td>Buenas prácticas basadas en evidencia</td><td>Natesan et al.</td></tr>
+      <tr><td>Evaluación formativa, tecnología e IA</td><td>Lipnevich, Mattern y Feddock</td></tr>
+      <tr><td>Cultura de mejora y relación docente-estudiante</td><td>Sargeant y Mann; Natesan et al.</td></tr>
+      <tr><td>Diseño de herramientas y rúbricas</td><td>Lipnevich, Mattern y Feddock</td></tr>
+    </tbody>
+  </table></div>
+  <div class="idea"><strong>📌 Idea clave</strong>La retroalimentación tras un examen debe entenderse como parte de un sistema formativo más amplio: criterios claros antes de evaluar, información útil después del examen y oportunidades reales para mejorar.</div>
+</section>
+
+<a class="back" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑ Volver arriba</a>
+
+</main>
+
+<footer>
+  <p><strong>Declaración de uso responsable de la IA.</strong> Durante la redacción del material incluido en esta página se utilizó <strong>Claude Sonnet 4.6</strong> para asistir en la estructuración y redacción del texto. Todo el material fue revisado por los autores.</p>
+  <br>
+  <p><strong>Universidad de Valladolid · Facultad de Medicina</strong> · Guía práctica para docentes clínicos y tutores · Evaluación formativa<br>
+  Proyecto de innovación docente <strong>EDUMed EvalUVa 4.0</strong> · Inteligencia artificial para transformar la evaluación docente en educación médica (2025–2026)<br>
+  Material educativo de uso interno · 2026</p>
+</footer>
+
+</body>
+</html>
